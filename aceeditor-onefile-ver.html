@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Editor(by ace editor)|onefile ver.</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- CDNs -->
+    <!-- ace editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ext-emmet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ext-language_tools.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ext-beautify.js"></script>
+    <!-- emmet -->
+    <script src="https://cloud9ide.github.io/emmet-core/emmet.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/vader/jquery-ui.css">
+    <!-- toastr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <!-- font awesome -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- normalize -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css">
+    <!-- iscroll -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.3/iscroll.min.js"></script>
+    <!-- drawer -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.0/css/drawer.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.0/js/drawer.min.js"></script>
+    <!-- moment.js -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
+    <!-- clipboard.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
+    <!-- js-beautify -->
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.6.3/js/lib/beautify.js"></script>
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.6.3/js/lib/beautify-css.js"></script>
+    <script src="https://cdn.rawgit.com/beautify-web/js-beautify/v1.6.3/js/lib/beautify-html.js"></script>
+
+    <style>
+        *, *:before, *:after {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+
+        body {
+            -ms-overflow-style: scrollbar;
+        }
+
+        @media screen and (max-width: 480px) {
+            html, body {
+                min-width: 320px;
+            }
+        }
+
+        body.is-loading *, body.is-loading *:before, body.is-loading *:after {
+            -moz-animation: none !important;
+            -webkit-animation: none !important;
+            -ms-animation: none !important;
+            animation: none !important;
+            -moz-transition: none !important;
+            -webkit-transition: none !important;
+            -ms-transition: none !important;
+            transition: none !important;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            background-color: #222222;
+            color: #dddddd;
+            font-family: Helvetica, Arial, Verdana, "Meiryo UI", "メイリオ", "Meiryo", sans-serif, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro";
+            font-size: 14pt;
+            font-weight: lighter;
+            line-height: 1.75;
+        }
+
+        a {
+            -moz-transition: border-bottom-color 0.08s ease, color 0.08s ease;
+            -webkit-transition: border-bottom-color 0.08s ease, color 0.08s ease;
+            -ms-transition: border-bottom-color 0.08s ease, color 0.08s ease;
+            transition: border-bottom-color 0.08s ease, color 0.08s ease;
+            text-decoration: none;
+            color: #dddddd;
+            border-bottom: dotted 1px rgba(255, 255, 255, 0.8);
+        }
+
+        a:hover {
+            border-bottom-color: transparent;
+            color: #3388ff !important;
+        }
+
+        hr {
+            border: 0;
+            border-bottom: solid 1px #c9c9c9;
+            margin: 0.5em 0;
+        }
+
+        label {
+            display: inline-block;
+            font-size: 0.9em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        footer {
+            bottom: 0;
+            width: 100%;
+            position: fixed;
+            display: block;
+            height: 2.5em;
+        }
+    
+        #line-status {
+            float: right;
+        }
+        
+        .no-decoration {
+            text-decoration: none;
+        }
+        
+        .fill {
+            width: 90%;
+            height: 89vh;
+        }
+        
+        .drawer-nav {
+            width: 14rem;
+            color: #dddddd;
+            background-color: #444444;
+        }
+
+        .drawer-toggle {
+            width: 25px;
+            height: 8px;
+        }
+        
+        .drawer-menu {
+            margin: .25em;
+            padding: .25em;
+            list-style: none;
+        }
+        
+        .drawer-hamburger-icon, .drawer-hamburger-icon:before, .drawer-hamburger-icon:after {
+            background-color: #aaaaaa;
+        }
+        
+        .drawer--right .drawer-nav {
+            right: -14rem;
+        }
+        
+        .drawer--right.drawer-open .drawer-hamburger {
+            right: 14rem;
+        }
+        
+        .no-display {
+            display: none;
+        }
+
+        .al-r {
+            float: right;
+        }
+
+        /* jQuery UI */
+        .ui-widget {
+            font-size: .84em;
+            font-weight: lighter;
+        }
+        .ui-selectmenu-button {
+            width: 120px !important;
+            height: 1.9em;
+        }
+        .ui-menu-item {
+            font-size: .84em;
+        }
+        .ui-button {
+            font-size: .84em;
+        }
+        .ui-tooltip-content {
+            font-size: .84em;
+        }
+        
+
+        /* other */
+        #panel-header-m {
+            display: none;
+        }
+        #panel-footer-m {
+            display: none;
+        }
+
+        #lctrl-m {
+            display: none;
+        }
+        .minimum {
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        #panel-line-contol-m {
+            right: 1.3em;
+            bottom: 4em;
+            width: 4%;
+            position: fixed;
+            display: block;
+            z-index: 1;
+        }
+
+        @media screen and (min-width: 1681px) {
+            body, input, select, textarea {
+                font-size: 13pt;
+            }
+            #panel-header-m {
+                display: none;
+            }
+            #panel-header {
+                display: block;
+            }
+            #lctrl {
+                display: block;
+            }
+            #lctrl-m {
+                display: none;
+            }
+            #panel-line-contol-m {
+                display: none;
+            }
+            #panel-line-control {
+                display: inline-block;
+            }
+            .fill {
+                width: 100%;
+                height: 89vh;
+            }
+            footer {
+                height:2.5em;
+            }
+        }
+
+        @media screen and (max-width: 1680px) {
+            body, input, select, textarea {
+                font-size: 13pt;
+            }
+            #panel-header-m {
+                display: none;
+            }
+            #panel-header {
+                display: block;
+            }
+            #lctrl {
+                display: block;
+            }
+            #lctrl-m {
+                display: none;
+            }
+            #panel-line-contol-m {
+                display: none;
+            }
+            #panel-line-control {
+                display: inline-block;
+            }
+            .fill {
+                width: 100%;
+                height: 89vh;
+            }
+            footer {
+                height:2.5em;
+            }
+        }
+        @media screen and (max-width: 1280px) {
+            body, input, select, textarea {
+                font-size: 12pt;
+            }
+            #panel-header-m {
+                display: none;
+            }
+            #panel-header {
+                display: block;
+            }
+            #lctrl {
+                display: block;
+            }
+            #lctrl-m {
+                display: none;
+            }
+            #panel-line-contol-m {
+                display: none;
+            }
+            #panel-line-control {
+                display: inline-block;
+            }
+            .fill {
+                width: 100%;
+                height: 89vh;
+            }
+            footer {
+                height:2.5em;
+            }
+        }
+        @media screen and (max-width: 736px) {
+            body, input, select, textarea {
+                font-size: 11pt;
+            }
+            #panel-header-m {
+                display: block;
+            }
+            #panel-header {
+                display: none;
+            }
+            #lctrl {
+                display: none;
+            }
+            #lctrl-m {
+                display: block;
+            }
+            #panel-line-contol-m {
+                display: block;
+            }
+            #panel-line-control {
+                display: none;
+            }
+            .fill {
+                width: 95%;
+                height: 89vh;
+            }
+            footer {
+                height:2.5em;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            body, input, select, textarea {
+                font-size: 11pt;
+            }
+            #panel-header-m {
+                display: block;
+            }
+            #panel-header {
+                display: none;
+            }
+            #lctrl {
+                display: none;
+            }
+            #lctrl-m {
+                display: block;
+            }
+            #panel-line-contol-m {
+                display: block;
+            }
+            #panel-line-control {
+                display: none;
+            }
+            .fill {
+                width: 90%;
+                height: 86vh;
+            }
+            footer {
+                height: 3.5em;
+            }
+        }
+        @media screen and (max-width: 360px) {
+            body, input, select, textarea {
+                font-size: 10pt;
+            }
+            #panel-header-m {
+                display: block;
+            }
+            #panel-header {
+                display: none;
+            }
+            #panel-line-contol-m {
+                display: block;
+            }
+            #panel-line-control {
+                display: none;
+            }
+            .fill {
+                width: 90%;
+                height: 86vh;
+            }
+            footer {
+                height: 3.5em;
+            }
+        }
+    </style>
+</head>
+
+<body class="drawer drawer--right">
+    <!-- drawer menu-->
+    <div id="menudrawer">
+        <button type="button" class="btn drawer-toggle drawer-hamburger">
+            <span class="sr-only">toggle navigation</span>
+            <span class="drawer-hamburger-icon"></span>
+        </button>
+
+        <nav class="drawer-nav">
+            <ul class="drawer-menu">
+                <!-- file open -->
+                <li>
+                    <input type="file" id="btn-open" class="no-display">
+                    <button id="f-btn-open" class="fa fa-folder-open-o" onclick="fileOpen();$('#btn-open').click();" title="Source File Open from Local Storage">TextFile Open</button>
+                </li>
+                <hr>
+                <!-- file save -->
+                <li>
+                    <button type="button" class="fa fa-floppy-o" id="btn-save" aria-hidden="true" title="File Save(The saved file, enter the download folder of your browser)" onclick="fileSave();">File Save</button>
+                </li>
+                <hr>
+                <!-- text copy -->
+                <li>
+                    <button id="copy-editor-text" class="copybtn fa fa-copy" data-clipboard-target="#dummy-textarea-copy" title="Editor Text Copy to Clipboard(safari not supported)">Editor Text Copy</button>
+                </li>
+                <hr>
+                <!-- mode selector -->
+                <li>
+                    <select id="mode-control">
+                        <option name="txt" id="ms-text" value="text">text</option>
+                        <option name="html" id="ms-html" value="html" selected="selected">html</option>
+                        <option name="js" id="ms-js" value="javascript">javascript</option>
+                        <option name="typescript" id="ms-typescript" value="typescript">typescript</option>
+                        <option name="css" id="ms-css" value="css">css</option>
+                        <option name="json" id="ms-json" value="json">json</option>
+                        <option name="php" id="ms-php" value="php">php</option>
+                        <option name="csharp" id="ms-csharp" value="csharp">csharp</option>
+                        <option name="java" id="ms-java" value="java">java</option>
+                        <option name="ruby" id="ms-ruby" value="ruby">ruby</option>
+                        <option name="xml" id="ms-xml" value="xml">xml</option>
+                    </select>
+                </li>
+                <hr>
+                <!-- code formatting(javascript/css/html) -->
+                <li>
+                    <button type="button" class="fa fa-code" id="btn-codeformatting" aria-hidden="true" title="Code Formatting(only [html/css/javascript])" onclick="jsbeautify();" accesskey="a">Code Formatter</button>
+                </li>
+                <hr>
+                <!-- font size control -->
+                <li>
+                    <select id="fontsize-control" title="Change Font Size">
+                        <option id="fs-largest" value="20">Largest</option>
+                        <option id="fs-large" value="18">Large</option>
+                        <option id="fs-normal" value="16" selected="selected">Normal</option>
+                        <option id="fs-small" value="14">Small</option>
+                        <option id="fs-smallest" value="12">Smallest</option>
+                    </select>
+                </li>
+                <hr>
+                <!-- line control -->
+                <li>
+                    <div id="lctrl">
+                        <label for="v-line-control-nav"><i class="icon ion-levels">LC</i></label>
+                        <input type="checkbox" id="v-line-control-nav" onClick="LControllerVisible('line-control', this.id, 'v-line-control', this.checked);" checked="checked" title="Line Controller Visible">
+                    </div>
+                    <div id="lctrl-m">
+                        <label for="v-line-control-nav-m"><i class="icon ion-levels">Line Control</i></label>
+                        <input type="checkbox" id="v-line-control-nav-m" onClick="LControllerVisible('line-control-m', this.id, 'v-line-control-nav-m', this.checked);" checked="checked" title="Line Controller Visible">
+                    </div>
+                </li>
+                <hr>
+                <!-- ace editor menu -->
+                <li>
+                    <button type="button" class="fa fa-th-large" id="btn-editormenu" aria-hidden="true" title="Open Ace Editor Settings">Ace Editor Setting</button>
+                </li>
+                <hr>
+                <!-- help link -->
+                <li>
+                    <a class="fa fa-th-list" id="default-shortcuts-list" href="https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts" target="_blank" title="Ace Editor Default ShortCut List">
+                        Ace Editor ShortCuts
+                    </a>
+                </li>
+                <hr>
+                <li>
+                    <a class="fa fa-list" id="cheat-sheet" href="http://docs.emmet.io/cheat-sheet/" target="_blank" title="Emmet Cheat Sheet">
+                        Emmet Cheat Sheet
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- header control group -->
+    <header class="header-navbar">
+        <!-- media query control group1 -->
+        <div id="panel-header-m">
+            <!-- ace editor menu -->
+            <button type="button" class="fa fa-th-large" id="btn-editormenu-nav" aria-hidden="true" title="Open Ace Editor Settings"></button>
+            <!-- edit control -->
+            <button id="btn-undo" class="fa fa-mail-reply" title="Undo(Ctrl + z)" onClick="editorUndo();"></button>
+            <button id="btn-redo" class="fa fa-mail-forward" title="Redo(Ctrl + y)" onClick="editorRedo();"></button>
+            <!-- file open(text) -->
+            <input type="file" id="btn-open" class="no-display">
+            <button id="f-btn-open" class="fa fa-folder-open-o" onclick="fileOpen();$('#btn-open').click();" title="Source File Open from Local Storage"></button>
+            <!-- file save -->
+            <button type="button" class="fa fa-floppy-o" id="btn-save" aria-hidden="true" title="File Save(The saved file, enter the download folder of your browser)" onclick="fileSave();"></button>
+            <!-- code formatting(javascript/css/html) -->
+            <button type="button" class="fa fa-code" id="btn-codeformatting" aria-hidden="true" title="Code Formatting(only [html/css/javascript])" onclick="jsbeautify();" accesskey="a"></button>
+            <!-- text copy -->
+            <button id="copy-editor-text" class="copybtn fa fa-copy" data-clipboard-target="#dummy-textarea-copy" title="Editor Text Copy to Clipboard(safari not supported)"></button>
+        </div>
+        <!-- media query control group1 -->
+        <div id="panel-header">
+            <!-- ace editor menu -->
+            <button type="button" class="fa fa-th-large" id="btn-editormenu-nav" aria-hidden="true" title="Open Ace Editor Settings"></button>
+            <!-- mode selector -->
+            <select id="mode-control-nav" title="Change Editor Mode">
+                <option name="txt" id="ms-text" value="text">text</option>
+                <option name="html" id="ms-html" value="html" selected="selected">html</option>
+                <option name="js" id="ms-js" value="javascript">javascript</option>
+                <option name="typescript" id="ms-typescript" value="typescript">typescript</option>
+                <option name="css" id="ms-css" value="css">css</option>
+                <option name="json" id="ms-json" value="json">json</option>
+                <option name="php" id="ms-php" value="php">php</option>
+                <option name="csharp" id="ms-csharp" value="csharp">csharp</option>
+                <option name="java" id="ms-java" value="java">java</option>
+                <option name="ruby" id="ms-ruby" value="ruby">ruby</option>
+                <option name="xml" id="ms-xml" value="xml">xml</option>
+            </select>
+            <!-- font size control -->
+            <select id="fontsize-control-nav" title="Change Font Size">
+                <option class="op-bg" id="fs-largest" value="20">Largest</option>
+                <option class="op-bg" id="fs-large" value="18">Large</option>
+                <option class="op-bg" id="fs-normal" value="16" selected="selected">Normal</option>
+                <option class="op-bg" id="fs-small" value="14">Small</option>
+                <option class="op-bg" id="fs-smallest" value="12">Smallest</option>
+            </select>
+            <!-- edit control -->
+            <button id="btn-undo" class="fa fa-mail-reply" title="Undo(Ctrl + z)" onClick="editorUndo();"></button>
+            <button id="btn-redo" class="fa fa-mail-forward" title="Redo(Ctrl + y)" onClick="editorRedo();"></button>
+            <!-- file open(text) -->
+            <input type="file" id="btn-open" class="no-display">
+            <button id="f-btn-open" class="fa fa-folder-open-o" onclick="fileOpen();$('#btn-open').click();" title="Source File Open from Local Storage"></button>
+            <!-- file save -->
+            <button class="fa fa-floppy-o" id="btn-save" aria-hidden="true" title="File Save(The saved file, enter the download folder of your browser)" onclick="fileSave();"></button>
+            <!-- code formatting(javascript/css/html) -->
+            <button type="button" class="fa fa-code" id="btn-codeformatting" aria-hidden="true" title="Code Formatting(only [html/css/javascript])" onclick="jsbeautify();" accesskey="a"></button>
+            <!-- text copy -->
+            <button id="copy-editor-text" class="copybtn fa fa-copy" data-clipboard-target="#dummy-textarea-copy" title="Editor Text Copy to Clipboard(safari not supported)"></button>
+
+        </div>
+    </header>
+
+    <!-- copy textarea(dummy) -->
+    <div id="dummy-copyarea" class="minimum">
+        <textarea id="dummy-textarea-copy"></textarea>
+    </div>
+
+    <!-- editor area -->
+    <div class="fill" id="editor-area"></div>
+
+    <!-- footer nav -->
+    <footer class="footer-navbar">
+        
+        <!-- media query control group2 -->
+        <!-- line control-m -->
+        <div id="panel-line-contol-m">
+            <label for="v-line-control-m"><i class="icon ion-levels"></i></label>
+            <input type="checkbox" id="v-line-control-m" onclick="LControllerVisible('line-control-m', this.id, 'v-line-control-nav-m', this.checked);" checked="checked">
+            <span id="line-control-m">
+                <!-- to start -->
+                <button id="pagetop-m" onClick="topLine();" class="ion-arrow-up-b" title="To File Start Line(Alt + t)" accesskey="t"></button>
+                <!-- to end -->
+                <button id="pageend-m" onClick="bottomLine();" class="ion-arrow-down-b" title="To File End Line(Alt + b)" accesskey="b"></button>
+                <!-- to visible start -->
+                <button id="visibletop-m" onClick="visibleTop();" class="ion-ios-arrow-up" title="To Visible Start Line(Alt + h)" accesskey="h"></button>
+                <!-- to visible end -->
+                <button id="visibleend-m" onClick="visibleBottom();" class="ion-ios-arrow-down" title="To Visible End Line(Alt + g)" accesskey="g"></button>
+                <!-- to line start -->
+                <button id="linetop-m" class="ion-chevron-left" onClick="lineStart();" title="To Line Start(Alt + c)" accesskey="c"></button>
+                <!-- to line end -->
+                <button id="lineend-m" class="ion-chevron-right" onClick="lineEnd();" title="To Line End(Alt + v)" accesskey="v"></button>
+            </span>
+        </div>
+        
+        <!-- media query control group2 -->
+        <div id="panel-footer">
+            <!-- line control -->
+            <span id="panel-line-control">
+                <label for="v-line-control"><i class="icon ion-levels">LC</i></label>
+                <input type="checkbox" id="v-line-control" onclick="LControllerVisible('line-control', this.id, 'v-line-control-nav', this.checked);" checked="checked">
+
+                <!-- to start -->
+                <button id="pagetop" onClick="topLine();" class="ion-arrow-up-b" title="To File Start Line(Alt + t)" accesskey="t"></button>
+                <!-- to end -->
+                <button id="pageend" onClick="bottomLine();" class="ion-arrow-down-b" title="To File End Line(Alt + b)" accesskey="b"></button>
+                <!-- to visible start -->
+                <button id="visibletop" onClick="visibleTop();" class="ion-ios-arrow-up" title="To Visible Start Line(Alt + h)" accesskey="h"></button>
+                <!-- to visible end -->
+                <button id="visibleend" onClick="visibleBottom();" class="ion-ios-arrow-down" title="To Visible End Line(Alt + g)" accesskey="g"></button>
+                <!-- to line start -->
+                <button id="linetop" class="ion-chevron-left" onClick="lineStart();" title="To Line Start(Alt + c)" accesskey="c"></button>
+                <!-- to line end -->
+                <button id="lineend" class="ion-chevron-right" onClick="lineEnd();" title="To Line End(Alt + v)" accesskey="v"></button>
+            </span>
+            <!-- editing filename -->
+            <span id="panel-filename">
+                <span id="openfilename">
+                    <label for="open-filename">File:</label>
+                    <span id="open-filename">Untitled</span>
+                </span>
+                <span id="openprogress">
+                    <label for="open-progress"></label>
+                    <span id="open-progress">-</span>
+                </span>
+            </span>
+            <!-- status -->
+            <span id="line-status" class="al-r">
+                <!-- mode -->
+                <label for="editor-mode">Mode:</label>
+                <span id="editor-mode"></span>
+                <!-- row -->
+                <label for="cur-row">Row:</label>
+                <span id="cur-row">1</span>
+                <!-- column-->
+                <label for="cur-col">Col:</label>
+                <span id="cur-col">1</span>
+                <!-- total line counts -->
+                <label for="all-lines">Lines:</label>
+                <span id="all-lines">1</span>
+            </span>
+        </div>
+    </footer>
+    <!-- end of contents -->
+
+    <script type="text/javascript">
+        "use strict";
+
+        /* Ace Editor */
+        var editchange = false;
+        var beautify = ace.require("ace/ext/beautify");
+        var jsbeautify_js = require("js-beautify");
+        var jsbeautify_html = require("beautify-html");
+        var jsbeautify_css = require("beautify-css");
+        var fs = require("fs");
+        var editor = ace.edit("editor-area");
+        editor.setOptions( {
+            enableEmmet: true,
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+        editor.$blockScrolling = Infinity;
+        editor.setShowPrintMargin(false);
+        editor.setFontSize(16);
+        editor.setAnimatedScroll(true);
+        editor.getSession().setMode("ace/mode/html");
+        editor.setTheme("ace/theme/tomorrow_night_eighties");
+
+        editor.commands.addCommand({
+            name: "openfile",
+            bindKey: {
+                win: "Ctrl-o",
+                mac: "Command-o"
+            },
+            exec: function(editor) {
+                document.getElementById("i-btn-open").click();
+            }
+        });
+
+        editor.commands.addCommand({
+            name: "savefile",
+            bindKey: {
+                win: "Ctrl-s",
+                mac: "Command-s"
+            },
+            exec: function(editor) {
+                fileSave();
+            }
+        });
+
+        /* editor event */
+        editor.on("changeSelection", function(e) {
+            updateCursorPosition();
+            updateCopyText();
+        });
+
+        editor.on("change", function(e) {
+            if (editchange){
+                return;
+            }
+            editchange = true;
+            document.getElementById("open-filename").innerText = "*" + document.getElementById("open-filename").innerText;
+        })
+
+        editor.getSession().on("changeMode", function(){
+            var fmode = editor.session.getMode().$id;
+            var editormode = fmode.split("/");
+            toastr.info(editormode[2]);
+            document.getElementById("editor-mode").innerText = editormode[2];
+            selectChange("#mode-control-nav", editormode[2]);
+            selectChange("#mode-control", editormode[2]);
+        });
+
+        editor.focus();
+
+        /* toastr setting */
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "200",
+            "hideDuration": "800",
+            "timeOut": "2500",
+            "extendedTimeOut": "800",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
+        /* === file control == */
+        /* fileAPI check */
+        function fileAPICheck() {
+            var APIChecker;
+            if (window.File) {
+                APIChecker = true;
+            }
+            else {
+                APIChecker = false;
+                toastr.warning("The File APIs are not fully supported in this browser.");
+            }
+            return APIChecker;
+        }
+
+        /* extension check */
+        function extCheck(filename) {
+            var value = "";
+            var ext = filename.substring(filename.lastIndexOf(".") + 1, filename.length);
+            switch (ext) {
+                case ("html"):
+                    value = "html";
+                    break;
+                case ("htm"):
+                    value = "html";
+                    break;
+                case ("js"):
+                    value = "javascript";
+                    break;
+                case ("ts"):
+                    value = "typescript";
+                    break;
+                case ("css"):
+                    value = "css";
+                    break;
+                case ("json"):
+                    value = "json";
+                    break;
+                case ("php"):
+                    value = "php";
+                    break;
+                case ("cs"):
+                    value = "csharp";
+                    break;
+                case ("java"):
+                    value = "java";
+                    break;
+                case ("rb"):
+                    value = "ruby";
+                    break;
+                case ("xml"):
+                    value = "xml";
+                    break;
+                case ("txt"):
+                    value = "text";
+                    break;
+                default:
+                    value = "text";
+                    break;
+            }
+            return value;
+        }
+
+        /* revease to extension */
+        function revExtCheck(filemode) {
+            var value = "";
+            switch (filemode) {
+                case ("html"):
+                    value = "html";
+                    break;
+                case ("htm"):
+                    value = "html";
+                    break;
+                case ("javascript"):
+                    value = "js";
+                    break;
+                case ("typescript"):
+                    value = "ts";
+                    break;
+                case ("css"):
+                    value = "css";
+                    break;
+                case ("json"):
+                    value = "json";
+                    break;
+                case ("php"):
+                    value = "php";
+                    break;
+                case ("csharp"):
+                    value = "cs";
+                    break;
+                case ("java"):
+                    value = "java";
+                    break;
+                case ("ruby"):
+                    value = "rb";
+                    break;
+                case ("xml"):
+                    value = "xml";
+                    break;
+                case ("text"):
+                    value = "txt";
+                    break;
+                default:
+                    value = "txt";
+                    break;
+            }
+            return value;
+        }
+
+        /* === file open === */
+        /* text file read */
+        function fileOpen() {
+            if (editchange) {
+                var conf = confirm("Save Changes?");
+                if (conf) {
+                    fileSave();
+                    return;
+                }
+            }
+            var checker = fileAPICheck();
+            if (!checker) {
+                return;
+            }
+            document.getElementById("btn-open").addEventListener("change", function (e) {
+                var input = document.getElementById("btn-open").files[0];
+                var ext = extCheck(input.name);
+                var reader = new FileReader();
+
+                reader.addEventListener("progress", function (event) {
+                    for (var i = 0; i < (event.loaded / event.total * 100); i++){
+                        document.getElementById("open-progress").innerText = Math.floor(event.loaded / event.total * 100) + "%";
+                    }
+                    
+                }, true);
+
+                reader.readAsText(input, "UTF-8");
+
+                reader.addEventListener("load", function (ev) {
+                    editor.setValue(reader.result, -1);
+                    var fileinfo = [
+                        "name: " + input.name,
+                        "type: " + input.type,
+                        "size(KB): " + Math.round((input.size / 1024) * 100) / 100,
+                        "last modified: " + input.lastModifiedDate.toLocaleDateString(),
+                        "urn: " + input.urn
+                    ];
+                    var info = fileinfo.join("<br>");
+
+                    document.getElementById("open-filename").innerText = input.name;
+                    editor.getSession().setMode("ace/mode/" + ext);
+                    toastr.success(info);
+                    editchange = false;
+                }, true);
+
+                reader.addEventListener("error", function (evt) {
+                    document.getElementById("open-filename").innerText = "File Read Error";
+                    var errmsg = [
+                        "",
+                        "NOT_FOUND_ERR\nファイルが見つかりません",
+                        "SECURITY_ERR\nセキュリティエラー",
+                        "ABORT_ERR\nファイルの読込が中断されました",
+                        "NOT_READABLE_ERR\nファイルの読み込み権限がありません",
+                        "ENCODING_ERR\nサイズ制限を超えました"
+                    ];
+                    toastr.error(errmsg[reader.error.code]);
+                    return;
+                }, true);
+
+                editor.focus();
+                
+            }, false);
+        }
+
+        /* === file save === */
+        function fileSave() {
+            var savetext = editor.getSession().getValue();
+            var ext = revExtCheck(function () {
+                        var value = editor.getSession().getMode().$id;
+                        var mode = value.split("/");
+                        return mode[2];
+                    } ());
+            var blob = new Blob([savetext], { type: "text/" + ext });
+
+            var dl_a = document.createElement("a");
+            dl_a.href = URL.createObjectURL(blob);
+            dl_a.tartget = "_blank";
+            dl_a.download = function () {
+                var fname = document.getElementById("open-filename").innerText;
+
+                if (fname.startsWith("*")) {
+                    fname = fname.substring(1);
+                    
+                }
+                fname = fname.replace("File: ", "");
+                if (fname === "Untitled") {
+                    fname += "." + ext;
+                    var today = moment();
+                    today = today.format("YYYYMMDD");
+                    fname = today + "_" + fname;
+                }
+                return fname;
+            } ();
+            dl_a.click();
+
+            URL.revokeObjectURL(blob);
+
+            toastr.success("saved.")
+        }
+
+        /* editor cursor position update */
+        function updateCursorPosition() {
+            var position = editor.getCursorPosition();
+            // indicate cursor postion elements
+            document.getElementById("cur-row").innerText = position.row + 1;
+            document.getElementById("cur-col").innerText = position.column + 1;
+            document.getElementById("all-lines").innerText = editor.getSession().getLength();
+        }
+
+        /* dummy textarea innerHtml update */
+        function updateCopyText() {
+            document.getElementById("dummy-textarea-copy").innerText = editor.getSession().getValue();
+        }
+
+        /* editor control functions */
+        function topLine() {
+            editor.navigateFileStart()
+            editor.gotoPageUp();
+            editor.focus();
+        }
+        function bottomLine() {
+            editor.navigateFileEnd();
+            editor.gotoPageDown();
+            editor.focus();
+        }
+        function visibleTop() {
+            editor.gotoLine(editor.getFirstVisibleRow());
+            editor.gotoPageUp();
+            editor.focus();
+        }
+        function visibleBottom() {
+            editor.gotoLine(editor.getLastVisibleRow());
+            editor.gotoPageDown();
+            editor.focus();
+        }
+        function lineStart() {
+            editor.navigateLineStart();
+            editor.focus();
+        }
+        function lineEnd() {
+            editor.navigateLineEnd();
+            editor.focus();
+        }
+        function editorUndo() {
+            editor.undo();
+            editor.focus();
+        }
+        function editorRedo() {
+            editor.redo();
+            editor.focus();
+        }
+
+        /* === others === */
+        /* select value change */
+        function selectChange(elemid, mode) {
+            $(elemid).val(mode);
+            $(elemid).selectmenu("refresh");
+        }
+
+        /* fontsize selector change */
+        function selectChange_fontsize(value) {
+            $("#fontsize-control-nav").val(value);
+            $("#fontsize-control").val(value);
+            $("#fontsize-control-nav").selectmenu("refresh");
+            $("#fontsize-control").selectmenu("refresh");
+        }
+
+        /* display editor/binaryfile area control */
+        function LControllerVisible(elemid, fromid, ctrlid, ischecked) {
+            var target = document.getElementById(elemid);
+            var fromtarget = document.getElementById(fromid);
+            var fortarget = document.getElementById(ctrlid);
+            if (ischecked) {
+                target.style.display = "inline-block";
+            }
+            else if (!ischecked) {
+                target.style.display = "none";
+            }
+            fortarget.checked = ischecked;
+        }
+
+        /* clipboard.js */
+        var clipboard = new Clipboard(".copybtn");
+        clipboard.on("success", function(e) {
+            toastr.success("copied.");
+            e.clearSelection();
+            editor.focus();
+        });
+        clipboard.on("error", function(e) {
+            toastr.error("copy failed.");
+            editor.focus();
+        });
+
+        /* code formatting (by js-beautify) */
+        function jsbeautify() {
+            var mode = getModeStr(editor.getSession().getMode().$id);
+            var formatCode = modeBeautify(mode, editor.session.getValue());
+            if (formatCode === "Not applicable") {
+                return;
+            }
+            else {
+                editor.setValue(formatCode, -1);
+                toastr.success("code formatted.<br>mode:" + mode);
+            }
+        }
+
+        /* code format */
+        function modeBeautify(mode, editorValue) {
+            var formatStr = "";
+
+            switch (mode) {
+                case "javascript":
+                    formatStr = js_beautify(editorValue);
+                    break;
+
+                case "css":
+                    formatStr = css_beautify(editorValue);
+                    break;
+
+                case "html":
+                    formatStr = html_beautify(editorValue);
+                    break;
+
+                default:
+                    toastr.warning("only [html/css/javascript] code.<br>Please check the mode of the editor.");
+                    formatStr = "Not applicable";
+            }
+
+            return formatStr;
+        }
+
+        /* get editor mode */
+        function getModeStr(modeStr) {
+            var mode = function () {
+                var value = modeStr.split("/");
+                return value[2];
+            } ();
+            return mode;
+        }
+
+        /* jQuery */
+        $(function () {
+            /* === UI === */
+            /* button */
+            $("input[type=submit], button").button();
+            $("input[type=checkbox], input[type=radio]").checkboxradio({
+                icon: false
+            });
+            /* select */
+            /* mode control */
+            $("#mode-control").selectmenu({
+                change: function (e) {
+                    editor.getSession().setMode("ace/mode/" + $(e.target).val());
+                    editor.focus();
+                }
+            });
+            $("#mode-control-nav").selectmenu({
+                change: function (e) {
+                    editor.getSession().setMode("ace/mode/" + $(e.target).val());
+                    editor.focus();
+                }
+            });
+            /* font size control */
+            $("#fontsize-control").selectmenu({
+                change: function (e) {
+                    editor.setFontSize(parseInt($(e.target).val()));
+                    toastr.info("fontsize:" + $(e.target).val());
+                    selectChange("#fontsize-control", $(e.target).val());
+                    selectChange("#fontsize-control-nav", $(e.target).val());
+                    editor.focus();
+                }
+            });
+            $("#fontsize-control-nav").selectmenu({
+                change: function (e) {
+                    editor.setFontSize(parseInt($(e.target).val()));
+                    toastr.info("fontsize:" + $(e.target).val());
+                    selectChange("#fontsize-control", $(e.target).val());
+                    selectChange("#fontsize-control-nav", $(e.target).val());
+                    editor.focus();
+                }
+            });
+
+            /* tooltip */
+            $(document).tooltip();
+            /* control group */
+            $("#panel-header").controlgroup();
+            $("#panel-header-m").controlgroup();
+            $("#line-control").controlgroup();
+            $("#panel-line-control").controlgroup();
+            /* drawer */
+            $(document).ready(function () {
+                $(".drawer").drawer();
+            });
+
+            /* === ready === */
+            /* ace editor menu open */
+            $("#btn-editormenu").click(function (e) {
+                editor.execCommand("showSettingsMenu");
+            });
+            $("#btn-editormenu-nav").click(function (e) {
+                editor.execCommand("showSettingsMenu");
+            });
+        });
+    </script>
+
+</body>
+
+</html>

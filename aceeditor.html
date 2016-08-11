@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Editor(by ace editor)</title>
+    
+    <!-- libraries -->
+    <!-- ace editor -->
+    <script src="lib/ace/ace.js"></script>
+    <script src="lib/ace/ext-emmet.js"></script>
+    <script src="lib/ace/ext-language_tools.js"></script>
+    <script src="lib/ace/ext-beautify.js"></script>
+    <!-- emmet -->
+    <script src="lib/emmet/emmet.js"></script>
+    <!-- jQuery -->
+    <script src="lib/jquery/jquery-3.1.0.min.js"></script>
+    <!-- jQuery UI -->
+    <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.structure.min.css">
+    <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.theme.min.css">
+    <script src="lib/jquery-ui/jquery-ui.min.js"></script>
+    <!-- toastr -->
+    <script src="lib/toastr/toastr.min.js"></script>
+    <link rel="stylesheet" href="lib/toastr/toastr.min.css">
+    <!-- font awesome -->
+    <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="lib/ionicons/css/ionicons.min.css">
+    <!-- normalize -->
+    <link rel="stylesheet" href="lib/normalize/normalize.css">
+    <!-- iscroll -->
+    <script src="lib/iscroll/build/iscroll.js"></script>
+    <!-- drawer -->
+    <link rel="stylesheet" href="lib/drawer/dist/css/drawer.min.css">
+    <script src="lib/drawer/dist/js/drawer.min.js"></script>
+    <!-- moment.js -->
+    <script src="lib/moment/moment.js"></script>
+    <!-- js-beutify -->
+    <script src="lib/js-beautify/lib/beautify.js"></script>
+    <script src="lib/js-beautify/lib/beautify-css.js"></script>
+    <script src="lib/js-beautify/lib/beautify-html.js"></script>
+    <!-- clipboard.js -->
+    <script src="lib/clipboard-js/dist/clipboard.min.js"></script>
+
+    <!-- user script/stylesheet -->
+    <script src="lib/js/editorFunction.js"></script>
+    <script src="lib/js/fileFunction.js"></script>
+    <script src="lib/js/otherFunction.js"></script>
+    <script src="lib/js/jquery.otherFunction.js"></script>
+    <link rel="stylesheet" href="lib/css/style.css">
+
+</head>
+
+<body class="drawer drawer--right">
+    <!-- drawer menu-->
+    <div id="menudrawer">
+        <button type="button" class="btn drawer-toggle drawer-hamburger">
+            <span class="sr-only">toggle navigation</span>
+            <span class="drawer-hamburger-icon"></span>
+        </button>
+
+        <nav class="drawer-nav">
+            <ul class="drawer-menu">
+                <!-- file open -->
+                <li>
+                    <input type="file" id="btn-open" class="no-display">
+                    <button id="f-btn-open" class="fa fa-folder-open-o" onclick="fileOpen();$('#btn-open').click();" title="Source File Open from Local Storage">TextFile Open</button>
+                </li>
+                <hr>
+                <!-- file save -->
+                <li>
+                    <button type="button" class="fa fa-floppy-o" id="btn-save" aria-hidden="true" title="File Save(The saved file, enter the download folder of your browser)" onclick="fileSave();">File Save</button>
+                </li>
+                <hr>
+                <!-- text copy -->
+                <li>
+                    <button id="copy-editor-text" class="copybtn fa fa-copy" data-clipboard-target="#dummy-textarea-copy" title="Editor Text Copy to Clipboard(safari not supported)">Editor Text Copy</button>
+                </li>
+                <hr>
+                <!-- mode selector -->
+                <li>
+                    <select id="mode-control">
+                        <option name="txt" id="ms-text" value="text">text</option>
+                        <option name="html" id="ms-html" value="html" selected="selected">html</option>
+                        <option name="js" id="ms-js" value="javascript">javascript</option>
+                        <option name="typescript" id="ms-typescript" value="typescript">typescript</option>
+                        <option name="css" id="ms-css" value="css">css</option>
+                        <option name="json" id="ms-json" value="json">json</option>
+                        <option name="php" id="ms-php" value="php">php</option>
+                        <option name="csharp" id="ms-csharp" value="csharp">csharp</option>
+                        <option name="java" id="ms-java" value="java">java</option>
+                        <option name="ruby" id="ms-ruby" value="ruby">ruby</option>
+                        <option name="xml" id="ms-xml" value="xml">xml</option>
+                    </select>
+                </li>
+                <hr>
+                <!-- code formatting(javascript/css/html) -->
+                <li>
+                    <button type="button" class="fa fa-code" id="btn-codeformatting" aria-hidden="true" title="Code Formatting(only [html/css/javascript])" onclick="jsbeautify();" accesskey="a">Code Formatter</button>
+                </li>
+                <hr>
+                <!-- font size control -->
+                <li>
+                    <select id="fontsize-control" title="Change Font Size">
+                        <option id="fs-largest" value="20">Largest</option>
+                        <option id="fs-large" value="18">Large</option>
+                        <option id="fs-normal" value="16" selected="selected">Normal</option>
+                        <option id="fs-small" value="14">Small</option>
+                        <option id="fs-smallest" value="12">Smallest</option>
+                    </select>
+                </li>
+                <hr>
+                <!-- line control -->
+                <li>
+                    <div id="lctrl">
+                        <label for="v-line-control-nav"><i class="icon ion-levels">LC</i></label>
+                        <input type="checkbox" id="v-line-control-nav" onClick="LControllerVisible('line-control', this.id, 'v-line-control', this.checked);" checked="checked" title="Line Controller Visible">
+                    </div>
+                    <div id="lctrl-m">
+                        <label for="v-line-control-nav-m"><i class="icon ion-levels">Line Control</i></label>
+                        <input type="checkbox" id="v-line-control-nav-m" onClick="LControllerVisible('line-control-m', this.id, 'v-line-control-nav-m', this.checked);" checked="checked" title="Line Controller Visible">
+                    </div>
+                </li>
+                <hr>
+                <!-- ace editor menu -->
+                <li>
+                    <button type="button" class="fa fa-th-large" id="btn-editormenu" aria-hidden="true" title="Open Ace Editor Settings">Ace Editor Setting</button>
+                </li>
+                <hr>
+                <!-- help link -->
+                <li>
+                    <a class="fa fa-th-list" id="default-shortcuts-list" href="https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts" target="_blank" title="Ace Editor Default ShortCut List">
+                        Ace Editor ShortCuts
+                    </a>
+                </li>
+                <hr>
+                <li>
+                    <a class="fa fa-list" id="cheat-sheet" href="http://docs.emmet.io/cheat-sheet/" target="_blank" title="Emmet Cheat Sheet">
+                        Emmet Cheat Sheet
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- header control group -->
+    <header class="header-navbar">
+        <!-- media query control group1 -->
+        <div id="panel-header-m">
+            <!-- ace editor menu -->
+            <button type="button" class="fa fa-th-large" id="btn-editormenu-nav" aria-hidden="true" title="Open Ace Editor Settings"></button>
+            <!-- edit control -->
+            <button id="btn-undo" class="fa fa-mail-reply" title="Undo(Ctrl + z)" onClick="editorUndo();"></button>
+            <button id="btn-redo" class="fa fa-mail-forward" title="Redo(Ctrl + y)" onClick="editorRedo();"></button>
+            <!-- code formatting(javascript/css/html) -->
+            <button type="button" class="fa fa-code" id="btn-codeformatting" aria-hidden="true" title="Code Formatting(only [html/css/javascript])" onclick="jsbeautify();" accesskey="a"></button>
+            <!-- text copy -->
+            <button id="copy-editor-text" class="copybtn fa fa-copy" data-clipboard-target="#dummy-textarea-copy" title="Editor Text Copy to Clipboard(safari not supported)"></button>
+        </div>
+        <!-- media query control group1 -->
+        <div id="panel-header">
+            <!-- ace editor menu -->
+            <button type="button" class="fa fa-th-large" id="btn-editormenu-nav" aria-hidden="true" title="Open Ace Editor Settings"></button>
+            <!-- mode selector -->
+            <select id="mode-control-nav" title="Change Editor Mode">
+                <option name="txt" id="ms-text" value="text">text</option>
+                <option name="html" id="ms-html" value="html" selected="selected">html</option>
+                <option name="js" id="ms-js" value="javascript">javascript</option>
+                <option name="typescript" id="ms-typescript" value="typescript">typescript</option>
+                <option name="css" id="ms-css" value="css">css</option>
+                <option name="json" id="ms-json" value="json">json</option>
+                <option name="php" id="ms-php" value="php">php</option>
+                <option name="csharp" id="ms-csharp" value="csharp">csharp</option>
+                <option name="java" id="ms-java" value="java">java</option>
+                <option name="ruby" id="ms-ruby" value="ruby">ruby</option>
+                <option name="xml" id="ms-xml" value="xml">xml</option>
+            </select>
+            <!-- font size control -->
+            <select id="fontsize-control-nav" title="Change Font Size">
+                <option class="op-bg" id="fs-largest" value="20">Largest</option>
+                <option class="op-bg" id="fs-large" value="18">Large</option>
+                <option class="op-bg" id="fs-normal" value="16" selected="selected">Normal</option>
+                <option class="op-bg" id="fs-small" value="14">Small</option>
+                <option class="op-bg" id="fs-smallest" value="12">Smallest</option>
+            </select>
+            <!-- edit control -->
+            <button id="btn-undo" class="fa fa-mail-reply" title="Undo(Ctrl + z)" onClick="editorUndo();"></button>
+            <button id="btn-redo" class="fa fa-mail-forward" title="Redo(Ctrl + y)" onClick="editorRedo();"></button>
+            <!-- file open(text) -->
+            <input type="file" id="btn-open" class="no-display">
+            <button id="f-btn-open" class="fa fa-folder-open-o" onclick="fileOpen();$('#btn-open').click();" title="Source File Open from Local Storage"></button>
+            <!-- file save -->
+            <button class="fa fa-floppy-o" id="btn-save" aria-hidden="true" title="File Save(The saved file, enter the download folder of your browser)" onclick="fileSave();"></button>
+            <!-- code formatting(javascript/css/html) -->
+            <button type="button" class="fa fa-code" id="btn-codeformatting" aria-hidden="true" title="Code Formatting(only [html/css/javascript])" onclick="jsbeautify();" accesskey="a"></button>
+            <!-- text copy -->
+            <button id="copy-editor-text" class="copybtn fa fa-copy" data-clipboard-target="#dummy-textarea-copy" title="Editor Text Copy to Clipboard(safari not supported)"></button>
+
+        </div>
+    </header>
+
+    <!-- copy textarea(dummy) -->
+    <div id="dummy-copyarea" class="minimum">
+        <textarea id="dummy-textarea-copy"></textarea>
+    </div>
+
+    <!-- editor area -->
+    <div class="fill" id="editor-area"></div>
+
+    <!-- footer nav -->
+    <footer class="footer-navbar">
+        
+        <!-- media query control group2 -->
+        <!-- line control-m -->
+        <div id="panel-line-contol-m">
+            <label for="v-line-control-m"><i class="icon ion-levels"></i></label>
+            <input type="checkbox" id="v-line-control-m" onclick="LControllerVisible('line-control-m', this.id, 'v-line-control-nav-m', this.checked);" checked="checked">
+            <span id="line-control-m">
+                <!-- to start -->
+                <button id="pagetop-m" onClick="topLine();" class="ion-arrow-up-b" title="To File Start Line(Alt + t)" accesskey="t"></button>
+                <!-- to end -->
+                <button id="pageend-m" onClick="bottomLine();" class="ion-arrow-down-b" title="To File End Line(Alt + b)" accesskey="b"></button>
+                <!-- to visible start -->
+                <button id="visibletop-m" onClick="visibleTop();" class="ion-ios-arrow-up" title="To Visible Start Line(Alt + h)" accesskey="h"></button>
+                <!-- to visible end -->
+                <button id="visibleend-m" onClick="visibleBottom();" class="ion-ios-arrow-down" title="To Visible End Line(Alt + g)" accesskey="g"></button>
+                <!-- to line start -->
+                <button id="linetop-m" class="ion-chevron-left" onClick="lineStart();" title="To Line Start(Alt + c)" accesskey="c"></button>
+                <!-- to line end -->
+                <button id="lineend-m" class="ion-chevron-right" onClick="lineEnd();" title="To Line End(Alt + v)" accesskey="v"></button>
+            </span>
+        </div>
+        
+        <!-- media query control group2 -->
+        <div id="panel-footer">
+            <!-- line control -->
+            <span id="panel-line-control">
+                <label for="v-line-control"><i class="icon ion-levels">LC</i></label>
+                <input type="checkbox" id="v-line-control" onclick="LControllerVisible('line-control', this.id, 'v-line-control-nav', this.checked);" checked="checked">
+
+                <!-- to start -->
+                <button id="pagetop" onClick="topLine();" class="ion-arrow-up-b" title="To File Start Line(Alt + t)" accesskey="t"></button>
+                <!-- to end -->
+                <button id="pageend" onClick="bottomLine();" class="ion-arrow-down-b" title="To File End Line(Alt + b)" accesskey="b"></button>
+                <!-- to visible start -->
+                <button id="visibletop" onClick="visibleTop();" class="ion-ios-arrow-up" title="To Visible Start Line(Alt + h)" accesskey="h"></button>
+                <!-- to visible end -->
+                <button id="visibleend" onClick="visibleBottom();" class="ion-ios-arrow-down" title="To Visible End Line(Alt + g)" accesskey="g"></button>
+                <!-- to line start -->
+                <button id="linetop" class="ion-chevron-left" onClick="lineStart();" title="To Line Start(Alt + c)" accesskey="c"></button>
+                <!-- to line end -->
+                <button id="lineend" class="ion-chevron-right" onClick="lineEnd();" title="To Line End(Alt + v)" accesskey="v"></button>
+            </span>
+            <!-- editing filename -->
+            <span id="panel-filename">
+                <span id="openfilename">
+                    <label for="open-filename">File:</label>
+                    <span id="open-filename">Untitled</span>
+                </span>
+                <span id="openprogress">
+                    <label for="open-progress"></label>
+                    <span id="open-progress">-</span>
+                </span>
+            </span>
+            <!-- status -->
+            <span id="line-status" class="al-r">
+                <!-- mode -->
+                <label for="editor-mode">Mode:</label>
+                <span id="editor-mode"></span>
+                <!-- row -->
+                <label for="cur-row">Row:</label>
+                <span id="cur-row">1</span>
+                <!-- column-->
+                <label for="cur-col">Col:</label>
+                <span id="cur-col">1</span>
+                <!-- total line counts -->
+                <label for="all-lines">Lines:</label>
+                <span id="all-lines">1</span>
+            </span>
+        </div>
+    </footer>
+    <!-- end of contents -->
+
+    <script type="text/javascript">
+        /* js-beautify */
+        var beautify_js = require("js-beautify");
+        var beautify_css = require("beautify-css");
+        var beautify_html = require("beautify-html");
+        /* Ace Editor */
+        var editchange = false;
+        var editor = ace.edit("editor-area");
+        editor.setOptions( {
+            enableEmmet: true,
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+        editor.$blockScrolling = Infinity;
+        editor.setShowPrintMargin(false);
+        editor.setFontSize(16);
+        editor.setAnimatedScroll(true);
+        editor.getSession().setMode("ace/mode/html");
+        editor.setTheme("ace/theme/tomorrow_night_eighties");
+        editor.focus();
+
+        /* keyboard shortcuts */
+        editor.commands.addCommand({
+            name: "openfile",
+            bindKey: {
+                win: "Ctrl-o",
+                mac: "Command-o"
+            },
+            exec: function(editor) {
+                document.getElementById("i-btn-open").click();
+            }
+        });
+
+        editor.commands.addCommand({
+            name: "savefile",
+            bindKey: {
+                win: "Ctrl-s",
+                mac: "Command-s"
+            },
+            exec: function(editor) {
+                fileSave();
+            }
+        });
+
+        /* editor event */
+        editor.on("changeSelection", function(e) {
+            updateCursorPosition();
+        });
+
+        editor.on("change", function(e) {
+            if (editchange){
+                return;
+            }
+            editchange = true;
+            document.getElementById("open-filename").innerText = "*" + document.getElementById("open-filename").innerText;
+        })
+
+        editor.getSession().on("changeMode", function(){
+            var fmode = editor.session.getMode().$id;
+            var editormode = fmode.split("/");
+            toastr.info(editormode[2]);
+            document.getElementById("editor-mode").innerText = editormode[2];
+            selectChange("#mode-control-nav", editormode[2]);
+            selectChange("#mode-control", editormode[2]);
+        });
+
+        /* toastr setting */
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "200",
+            "hideDuration": "800",
+            "timeOut": "2500",
+            "extendedTimeOut": "800",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
+        /* clipboard.js */
+        var clipboard = new Clipboard(".copybtn");
+        clipboard.on("success", function(e) {
+            toastr.success("copied.");
+            e.clearSelection();
+            editor.focus();
+        });
+        clipboard.on("error", function(e) {
+            toastr.error("copy failed.");
+            editor.focus();
+        });
+
+    </script>
+
+</body>
+
+</html>
