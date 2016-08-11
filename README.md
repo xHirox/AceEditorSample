@@ -6,7 +6,7 @@ onsource versionとネットワーク無しで動くlocal versionの2つを作�
 下記でも公開しています。  
 [aceeditor](http://stdeclipce.webcrow.jp/aceeditor.html)  
 [onefile-ver](http://stdeclipce.webcrow.jp/aceeditor-onefile-ver.html)  
------
+----
 コード整形は[js-beautify](https://github.com/beautify-web/js-beautify)を使用させていただき、html・css・javascriptが整形可能です。  
 -----
 使用しているプラグイン：  
